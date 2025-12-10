@@ -1,0 +1,36 @@
+name: Deploy Flask
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # ...existing code...
+
+    # 5️⃣ Copiar proyecto al servidor solo si tests pasan
+    - name: Copy project to server via SSH
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        source: "api-citas-flask/"
+        target: "/var/www/alumnos/rhernandez/flask_app/api-citas-flask"
+
+    # 6️⃣ Reiniciar Apache en el servidor
+    - name: Restart Apache on server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          cd /var/www/alumnos/rhernandez/flask_app
+          source venv/bin/activate
+          pip install -r api-citas-flask/requirements.txt
+          sudo systemctl restart apache2

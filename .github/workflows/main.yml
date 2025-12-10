@@ -10,7 +10,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # ...existing code...
+    # 1️⃣ Obtener el código
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # 2️⃣ Configurar Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12.3
+
+    # 3️⃣ Instalar dependencias y pytest
+    - name: Install dependencies
+      run: |
+        cd api-citas-flask
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+
+    # 4️⃣ Ejecutar tests
+    - name: Run tests
+      run: |
+        cd api-citas-flask
+        pytest -q tests
 
     # 5️⃣ Copiar proyecto al servidor solo si tests pasan
     - name: Copy project to server via SSH

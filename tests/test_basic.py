@@ -7,6 +7,7 @@ def client():
         yield client
 
 def test_home(client):
-    """Comprobar que la ruta raíz funciona"""
+    """Probar la ruta raíz '/'"""
     res = client.get("/")
     assert res.status_code == 200
+    assert b"Hello, World!" in res.data

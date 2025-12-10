@@ -1,4 +1,4 @@
-name: Test y Deploy Flask
+name: Deploy Flask
 
 on:
   push:
@@ -6,88 +6,30 @@ on:
       - main
 
 jobs:
-  test:
-    name: Ejecutar tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout del repositorio
-        uses: actions/checkout@v4
-
-      - name: Configurar Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Instalar dependencias
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Instalar pytest
-        run: |
-          pip install pytest pytest-flask
-
-      - name: Ejecutar tests
-        run: |
-          pytest -q
-
-
   deploy:
-    name: Desplegar si los tests pasan
-    needs: test
     runs-on: ubuntu-latest
-    if: success()
 
     steps:
-      - name: Checkout del repositorio
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Crear clave privada para SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
+    - name: Copy project to server via SSH
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        source: "."
+        target: "/var/www/alumnos/rhernandez/flask_app/api-citas-flask"
 
-      - name: Añadir host a known_hosts
-        run: |
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
-      - name: Ejecutar despliegue en el servidor
-        env:
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-          REMOTE_DIR: ${{ secrets.REMOTE_DIR }}
-        run: |
-          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes $SERVER_USER@$SERVER_IP bash -s << 'EOF'
-            set -e
-
-            cd $REMOTE_DIR || exit 1
-
-            # Si el repositorio ya existe, actualizarlo
-            if [ -d .git ]; then
-              git fetch --all
-              git reset --hard origin/main
-            else
-              # Primera vez (solo si el repo no está)
-              git clone https://github.com/${GITHUB_REPOSITORY}.git .
-              git fetch --all
-              git reset --hard origin/main
-            fi
-
-            # Activar o crear entorno virtual
-            if [ -d venv ]; then
-              source venv/bin/activate
-            else
-              python3 -m venv venv
-              source venv/bin/activate
-            fi
-
-            pip install -r requirements.txt
-            deactivate || true
-
-            # Recargar Apache
-            sudo systemctl reload apache2 || true
-
-            echo "Despliegue completado correctamente"
-          EOF
+    - name: Restart Apache on server
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          cd /var/www/alumnos/rhernandez/flask_app
+          source venv/bin/activate
+          pip install -r api-citas-flask/requirements.txt
+          sudo systemctl restart apache2

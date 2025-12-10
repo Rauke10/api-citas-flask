@@ -38,11 +38,10 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
-        source: "./"
+        source: "*.py,requirements.txt,migrations/,tests/,wsgi.py,README.md"
         target: "/var/www/alumnos/rhernandez/flask_app"
         strip_components: 0
         overwrite: true
-        rm: false
 
     # 6️⃣ Reiniciar Apache en el servidor
     - name: Restart Apache on server

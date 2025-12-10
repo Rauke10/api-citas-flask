@@ -29,6 +29,6 @@ def test_post_without_data(client):
     res = client.post("/")
     assert res.status_code in [404, 405, 400]
 
-def test_intentional_failure(client):
-    """TEST QUE FALLA INTENCIONADAMENTE - Verificar CI/CD"""
-    assert False, "Este test falla a propósito para verificar que el CI/CD bloquea el despliegue"
+#def test_intentional_failure(client):
+    #TEST QUE FALLA INTENCIONADAMENTE - Verificar CI/CD
+    #assert False, "Este test falla a propósito para verificar que el CI/CD bloquea el despliegue"

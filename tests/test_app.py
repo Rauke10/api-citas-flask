@@ -21,7 +21,7 @@ def test_cors_headers(client):
 
 def test_invalid_route(client):
     """Test de ruta inexistente"""
-    res = client.get("/ruta-no-existe")
+    res = client.get("/ruta-inexistente")
     assert res.status_code == 404
 
 def test_post_without_data(client):

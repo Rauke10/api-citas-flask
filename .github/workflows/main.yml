@@ -52,5 +52,4 @@ jobs:
           cd /var/www/alumnos/rhernandez/flask_app/api-citas-flask
           source ../venv/bin/activate
           pip install -r requirements.txt
-          sudo a2dissite rhernandez.conf
-          sudo systemctl reload apache2
+          touch ../wsgi.py

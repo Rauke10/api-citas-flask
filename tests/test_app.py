@@ -1,4 +1,5 @@
 def test_home(client):
+    """Test del endpoint raíz"""
     res = client.get("/")
     assert res.status_code == 200
     assert b"Hello, World!" in res.data
@@ -20,7 +21,7 @@ def test_cors_headers(client):
 
 def test_invalid_route(client):
     """Test de ruta inexistente"""
-    res = client.get("/ruta-inexistente")
+    res = client.get("/ruta-no-existe")
     assert res.status_code == 404
 
 def test_post_without_data(client):

@@ -39,7 +39,10 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         source: "./"
-        target: "/var/www/alumnos/rhernandez/flask_app/api-citas-flask"
+        target: "/var/www/alumnos/rhernandez/flask_app"
+        strip_components: 0
+        overwrite: true
+        rm: false
 
     # 6️⃣ Reiniciar Apache en el servidor
     - name: Restart Apache on server
@@ -49,7 +52,7 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
-          cd /var/www/alumnos/rhernandez/flask_app/api-citas-flask
-          source ../venv/bin/activate
+          cd /var/www/alumnos/rhernandez/flask_app
+          source venv/bin/activate
           pip install -r requirements.txt
-          touch ../wsgi.py
+          touch wsgi.py

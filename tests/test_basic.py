@@ -1,5 +1,11 @@
+import sys
+import os
 import pytest
-from application import app  # ajusta según tu nombre de app
+
+# Añadir la carpeta del repo al PYTHONPATH
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from application import app
 
 @pytest.fixture
 def client():
@@ -7,7 +13,7 @@ def client():
         yield client
 
 def test_home(client):
-    """Probar la ruta raíz '/'"""
     res = client.get("/")
     assert res.status_code == 200
     assert b"Hello, World!" in res.data
+
